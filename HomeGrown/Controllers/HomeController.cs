@@ -1,28 +1,36 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using HomeGrown.Models;
-using HomeGrown.Data;
+using HomeGrown.Services;
 
 namespace HomeGrown.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly HomeGrownDbContext _context;
+    private readonly MockDataService _data;
 
-    public HomeController(HomeGrownDbContext context)
+    public HomeController(MockDataService data)
     {
-        _context = context;
+        _data = data;
     }
 
     public IActionResult Index()
     {
-        var products = _context.Products.ToList();
-        return View(products);
+        ViewBag.FeaturedProducts = _data.GetFeaturedProducts(6);
+        ViewBag.Farms = _data.GetFarms();
+        ViewBag.SpotlightFarm = _data.GetFarm(1);
+        return View();
     }
 
     public IActionResult Privacy()
     {
         return View();
+    }
+
+    public new IActionResult NotFound()
+    {
+        Response.StatusCode = 404;
+        return View("NotFound");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

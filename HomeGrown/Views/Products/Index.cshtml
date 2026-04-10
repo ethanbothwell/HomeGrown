@@ -1,0 +1,157 @@
+@using HomeGrown.Models
+@{
+    Layout = "_Layout";
+    var product = ViewBag.Product as Product;
+    var farm = ViewBag.Farm as Farm;
+    var related = ViewBag.RelatedProducts as List<Product> ?? new List<Product>();
+    ViewData["Title"] = product?.Name ?? "Product";
+}
+
+@if (product == null)
+{
+    <div class="container py-5 text-center">
+        <h2>Product not found.</h2>
+        <a asp-controller="Discover" asp-action="Index" class="btn btn-forest mt-3">Browse Products</a>
+    </div>
+    return;
+}
+
+<div class="product-detail-page py-5">
+    <div class="container">
+        <!-- BREADCRUMB -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb hg-breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Discover" asp-action="Index">Discover</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Discover" asp-action="Index" asp-route-category="@product.Category">@product.Category</a></li>
+                <li class="breadcrumb-item active">@product.Name</li>
+            </ol>
+        </nav>
+
+        <div class="row g-5 align-items-start">
+            <!-- PRODUCT IMAGE -->
+            <div class="col-lg-6 fade-in-up">
+                <div class="product-detail__image-frame">
+                    <img src="@product.ImageUrl" alt="@product.Name" class="product-detail__img" />
+                    <span class="product-detail__category-badge">@product.Category</span>
+                    @if (!product.InStock)
+                    {
+                        <div class="product-detail__oos-overlay">
+                            <span>Currently Out of Stock</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- PRODUCT DETAILS -->
+            <div class="col-lg-6 fade-in-up">
+                <p class="product-detail__farm-link">
+                    <a href="/Farms/@product.FarmId" class="farm-link">
+                        <i class="bi bi-geo-alt me-1"></i>@product.FarmName &bull; @product.FarmLocation
+                    </a>
+                </p>
+                <h1 class="product-detail__name">@product.Name</h1>
+
+                <div class="product-detail__price-row">
+                    <span class="product-detail__price">$@product.Price.ToString("F2")</span>
+                    <span class="product-detail__unit">/ @product.Unit</span>
+                </div>
+
+                <p class="product-detail__desc">@product.Description</p>
+
+                @if (!string.IsNullOrEmpty(product.Tags))
+                {
+                    <div class="product-detail__tags mb-3">
+                        @foreach (var tag in product.Tags.Split(','))
+                        {
+                            <span class="product-tag">@tag.Trim()</span>
+                        }
+                    </div>
+                }
+
+                @if (product.InStock)
+                {
+                    <form asp-controller="Cart" asp-action="Add" method="post" class="product-detail__add-form">
+                        <input type="hidden" name="productId" value="@product.Id" />
+                        <div class="qty-row d-flex align-items-center gap-3 mb-4">
+                            <label class="qty-label">Quantity</label>
+                            <div class="qty-stepper">
+                                <button type="button" class="qty-btn qty-minus">−</button>
+                                <input type="number" name="quantity" class="qty-input" value="1" min="1" max="20" />
+                                <button type="button" class="qty-btn qty-plus">+</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-forest btn-lg w-100 mb-2">
+                            <i class="bi bi-basket me-2"></i>Add to Cart
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-secondary">
+                        <i class="bi bi-clock me-2"></i>This product is currently out of stock. Check back soon or browse more from this farm.
+                    </div>
+                }
+
+                <a href="/Farms/@product.FarmId" class="btn btn-outline-forest w-100">
+                    <i class="bi bi-shop me-1"></i>See All Products from @product.FarmName
+                </a>
+
+                <!-- FARM INFO CARD -->
+                @if (farm != null)
+                {
+                    <div class="from-farm-card mt-4">
+                        <h6 class="from-farm-card__title">From the Farm</h6>
+                        <div class="d-flex gap-3 align-items-center">
+                            <img src="@farm.OwnerImageUrl" alt="@farm.OwnerName" class="from-farm-avatar" />
+                            <div>
+                                <strong>@farm.Name</strong>
+                                <p class="mb-0 text-muted small">@farm.Location &bull; &#9733; @farm.Rating.ToString("F1")</p>
+                                <p class="mb-0 text-muted small">@farm.Bio[..Math.Min(100, farm.Bio.Length)]…</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- RELATED PRODUCTS -->
+        @if (related.Any())
+        {
+            <div class="related-products mt-6 pt-5 fade-in-up">
+                <h3 class="related-title">More from @product.FarmName</h3>
+                <div class="row g-4">
+                    @foreach (var rel in related)
+                    {
+                        <div class="col-sm-6 col-lg-4">
+                            <div class="product-card">
+                                <div class="product-card__image-wrap position-relative">
+                                    <a href="/Products/@rel.Id">
+                                        <img src="@rel.ImageUrl" alt="@rel.Name" class="product-card__img" loading="lazy" />
+                                    </a>
+                                    <span class="product-card__category-badge">@rel.Category</span>
+                                </div>
+                                <div class="product-card__body">
+                                    <h5 class="product-card__name">
+                                        <a href="/Products/@rel.Id" class="product-name-link">@rel.Name</a>
+                                    </h5>
+                                    <div class="product-card__footer">
+                                        <span class="product-card__price">$@rel.Price.ToString("F2")</span>
+                                        @if (rel.InStock)
+                                        {
+                                            <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                                <input type="hidden" name="productId" value="@rel.Id" />
+                                                <input type="hidden" name="quantity" value="1" />
+                                                <button type="submit" class="btn btn-terra btn-sm">Add</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

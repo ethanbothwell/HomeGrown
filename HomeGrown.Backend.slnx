@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/HomeGrown.Core/HomeGrown.Core.csproj" />
+  <Project Path="src/HomeGrown.Infrastructure/HomeGrown.Infrastructure.csproj" />
+  <Project Path="src/HomeGrown.API/HomeGrown.API.csproj" />
+  <Project Path="tests/HomeGrown.Tests/HomeGrown.Tests.csproj" />
+</Solution>

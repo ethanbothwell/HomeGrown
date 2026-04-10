@@ -1,0 +1,218 @@
+@using HomeGrown.Models
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Farmer Dashboard";
+    string userName = ViewBag.UserName ?? "Farmer";
+    var farm = ViewBag.Farm as Farm;
+    var products = ViewBag.Products as List<Product> ?? new List<Product>();
+    var chartLabels = ViewBag.ChartLabels as string[] ?? Array.Empty<string>();
+    var chartData = ViewBag.ChartData as int[] ?? Array.Empty<int>();
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(chartLabels)),
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(chartData)),
+                        backgroundColor: 'rgba(45,80,22,0.75)',
+                        borderColor: '#2D5016',
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) { return ' $' + ctx.parsed.y.toLocaleString(); }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: function(v) { return '$' + v; } },
+                            grid: { color: 'rgba(0,0,0,0.06)' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<div class="dashboard-page py-5">
+    <div class="container">
+        <!-- GREETING -->
+        <div class="dashboard-greeting mb-5 fade-in-up">
+            <h1 class="dashboard-greeting__title">
+                @if (farm != null) { <span>@farm.Name</span> }
+                else { <span>Farmer Dashboard</span> }
+            </h1>
+            <p class="dashboard-greeting__sub">Welcome back, @userName. Here's how your farm is doing.</p>
+        </div>
+
+        <!-- STATS -->
+        <div class="row g-3 mb-5 fade-in-up">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card stat-card--green">
+                    <div class="stat-card__icon"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="stat-card__value">$1,760</div>
+                    <div class="stat-card__label">Revenue This Month</div>
+                    <div class="stat-card__trend text-success"><i class="bi bi-arrow-up-short"></i> +31% vs last month</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-bag-check"></i></div>
+                    <div class="stat-card__value">24</div>
+                    <div class="stat-card__label">Orders This Month</div>
+                    <div class="stat-card__trend text-success"><i class="bi bi-arrow-up-short"></i> +8 vs last month</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-box-seam"></i></div>
+                    <div class="stat-card__value">@products.Count</div>
+                    <div class="stat-card__label">Active Products</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-star-fill"></i></div>
+                    <div class="stat-card__value">@farm?.Rating.ToString("F1")</div>
+                    <div class="stat-card__label">Average Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <!-- REVENUE CHART -->
+                <div class="dashboard-card mb-4 fade-in-up">
+                    <div class="dashboard-card__header">
+                        <h5>Revenue — Last 6 Months</h5>
+                    </div>
+                    <canvas id="revenueChart" height="100"></canvas>
+                </div>
+
+                <!-- PRODUCT MANAGEMENT -->
+                <div class="dashboard-card fade-in-up">
+                    <div class="dashboard-card__header">
+                        <h5>My Products</h5>
+                        <button class="btn btn-terra btn-sm">
+                            <i class="bi bi-plus me-1"></i>Add Product
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in products)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <img src="@product.ImageUrl" alt="@product.Name" class="table-product-img" />
+                                                <span>@product.Name</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="category-chip">@product.Category</span></td>
+                                        <td>$@product.Price.ToString("F2")</td>
+                                        <td>
+                                            @if (product.InStock)
+                                            {
+                                                <span class="status-badge status-badge--delivered">In Stock</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge status-badge--pending">Out of Stock</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <button class="btn btn-outline-forest btn-xs">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-xs">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- RECENT ORDERS -->
+                <div class="dashboard-card mb-4 fade-in-up">
+                    <div class="dashboard-card__header">
+                        <h5>Recent Orders</h5>
+                    </div>
+                    @foreach (var order in ViewBag.RecentOrders)
+                    {
+                        <div class="farmer-order-item">
+                            <div class="farmer-order-info">
+                                <strong>#@order.Id</strong>
+                                <p class="mb-0 small text-muted">@order.Customer</p>
+                                <p class="mb-0 small text-muted">@order.Date</p>
+                            </div>
+                            <div class="text-end">
+                                <strong>@order.Total</strong>
+                                <p class="mb-0">
+                                    <span class="status-badge status-badge--@(order.Status.ToLower() == "delivered" ? "delivered" : order.Status.ToLower() == "shipped" ? "shipped" : "pending")">
+                                        @order.Status
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- QUICK LINKS -->
+                <div class="dashboard-card fade-in-up">
+                    <h5 class="mb-3">Quick Actions</h5>
+                    <div class="quick-links">
+                        @if (farm != null)
+                        {
+                            <a href="/Farms/@farm.Id" class="quick-link-btn">
+                                <i class="bi bi-eye"></i> View My Farm Page
+                            </a>
+                        }
+                        <a asp-controller="Discover" asp-action="Index" class="quick-link-btn">
+                            <i class="bi bi-grid"></i> Browse Marketplace
+                        </a>
+                        <a asp-controller="Map" asp-action="Index" class="quick-link-btn">
+                            <i class="bi bi-map"></i> Farm Map
+                        </a>
+                        <a asp-controller="Account" asp-action="Logout" class="quick-link-btn quick-link-btn--danger">
+                            <i class="bi bi-box-arrow-right"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

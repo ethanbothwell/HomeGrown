@@ -1,0 +1,139 @@
+@using HomeGrown.Models
+@model CheckoutViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="checkout-page py-5">
+    <div class="container">
+        <!-- STEPS -->
+        <div class="checkout-steps mb-5">
+            <div class="checkout-step active">
+                <div class="checkout-step__circle">1</div>
+                <span>Delivery</span>
+            </div>
+            <div class="checkout-step__line"></div>
+            <div class="checkout-step active">
+                <div class="checkout-step__circle">2</div>
+                <span>Payment</span>
+            </div>
+            <div class="checkout-step__line"></div>
+            <div class="checkout-step">
+                <div class="checkout-step__circle">3</div>
+                <span>Confirm</span>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <!-- CHECKOUT FORM -->
+            <div class="col-lg-7">
+                <form asp-controller="Checkout" asp-action="Confirm" method="post">
+
+                    <!-- DELIVERY -->
+                    <div class="checkout-section mb-4">
+                        <h4 class="checkout-section__title">
+                            <i class="bi bi-truck me-2"></i>Delivery Information
+                        </h4>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label checkout-label">Full Name</label>
+                                <input type="text" name="FullName" class="form-control checkout-input" placeholder="Jane Smith" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label checkout-label">Email Address</label>
+                                <input type="email" name="Email" class="form-control checkout-input" placeholder="jane@example.com" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label checkout-label">Street Address</label>
+                                <input type="text" name="Address" class="form-control checkout-input" placeholder="123 Main Street" required />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label checkout-label">City</label>
+                                <input type="text" name="City" class="form-control checkout-input" placeholder="Portland" required />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label checkout-label">State</label>
+                                <input type="text" name="State" class="form-control checkout-input" placeholder="OR" maxlength="2" required />
+                            </div>
+                            <div class="col-3">
+                                <label class="form-label checkout-label">ZIP</label>
+                                <input type="text" name="Zip" class="form-control checkout-input" placeholder="97201" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAYMENT -->
+                    <div class="checkout-section mb-4">
+                        <h4 class="checkout-section__title">
+                            <i class="bi bi-credit-card me-2"></i>Payment Details
+                        </h4>
+                        <p class="checkout-payment-notice">
+                            <i class="bi bi-shield-lock me-1"></i>This is a demo. No real payment is processed.
+                        </p>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label checkout-label">Card Number</label>
+                                <div class="card-input-wrap">
+                                    <input type="text" name="CardNumber" class="form-control checkout-input" placeholder="4242 4242 4242 4242" maxlength="19" />
+                                    <div class="card-icons">
+                                        <i class="bi bi-credit-card-2-front"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label checkout-label">Expiry</label>
+                                <input type="text" name="CardExpiry" class="form-control checkout-input" placeholder="MM / YY" maxlength="7" />
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label checkout-label">CVV</label>
+                                <input type="text" name="CardCvv" class="form-control checkout-input" placeholder="123" maxlength="4" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-forest btn-lg w-100">
+                        <i class="bi bi-check-circle me-2"></i>Place Order — $@Model.Total.ToString("F2")
+                    </button>
+                    <p class="checkout-fine-print text-center mt-2">
+                        By placing your order, you support independent farmers directly.
+                    </p>
+                </form>
+            </div>
+
+            <!-- ORDER SUMMARY -->
+            <div class="col-lg-5">
+                <div class="order-summary-card sticky-top" style="top: 90px;">
+                    <h5 class="order-summary-card__title">Order Summary</h5>
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="checkout-summary-item">
+                            <img src="@item.ImageUrl" alt="@item.ProductName" class="checkout-summary-img" />
+                            <div class="checkout-summary-info">
+                                <p class="checkout-summary-name">@item.ProductName</p>
+                                <p class="checkout-summary-farm">@item.FarmName</p>
+                                <p class="checkout-summary-qty">Qty: @item.Quantity</p>
+                            </div>
+                            <span class="checkout-summary-price">$@((item.Price * item.Quantity).ToString("F2"))</span>
+                        </div>
+                    }
+                    <div class="order-summary-divider my-3"></div>
+                    <ul class="order-summary-list">
+                        <li>
+                            <span>Subtotal</span>
+                            <span>$@Model.Total.ToString("F2")</span>
+                        </li>
+                        <li>
+                            <span>Delivery</span>
+                            <span>$5.99</span>
+                        </li>
+                        <li class="order-summary-list__total">
+                            <span>Total</span>
+                            <span>$@((Model.Total + 5.99m).ToString("F2"))</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

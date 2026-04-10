@@ -1,0 +1,26 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Page Not Found";
+}
+
+<div class="notfound-page">
+    <div class="container text-center py-5">
+        <div class="notfound-illustration mb-4">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="60" r="58" stroke="#87A878" stroke-width="2" stroke-dasharray="6 4"/>
+                <text x="50%" y="52%" dominant-baseline="middle" text-anchor="middle" font-size="48" fill="#2D5016" font-family="serif">404</text>
+                <path d="M40 75 Q60 65 80 75" stroke="#C4622D" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            </svg>
+        </div>
+        <h1 class="notfound-title">Looks like this crop didn't make it to market.</h1>
+        <p class="notfound-subtitle">The page you're looking for has been harvested, moved, or never existed. Let's get you back on the right row.</p>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-forest btn-lg">
+                <i class="bi bi-house me-2"></i>Back to Home
+            </a>
+            <a asp-controller="Discover" asp-action="Index" class="btn btn-outline-forest btn-lg">
+                Browse Products
+            </a>
+        </div>
+    </div>
+</div>

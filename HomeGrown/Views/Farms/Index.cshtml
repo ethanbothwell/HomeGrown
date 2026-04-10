@@ -1,0 +1,221 @@
+@using HomeGrown.Models
+@{
+    Layout = "_Layout";
+    var farm = ViewBag.Farm as Farm;
+    var products = ViewBag.Products as List<Product> ?? new List<Product>();
+    var reviews = ViewBag.Reviews as List<Review> ?? new List<Review>();
+    ViewData["Title"] = farm?.Name ?? "Farm";
+}
+
+@if (farm == null)
+{
+    <div class="container py-5 text-center">
+        <h2>Farm not found.</h2>
+        <a asp-controller="Map" asp-action="Index" class="btn btn-forest mt-3">Browse All Farms</a>
+    </div>
+    return;
+}
+
+<!-- FARM HERO -->
+<section class="farm-hero" style="background-image: url('@farm.ImageUrl')">
+    <div class="farm-hero__overlay"></div>
+    <div class="farm-hero__content container">
+        <nav aria-label="breadcrumb" class="farm-breadcrumb mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li class="breadcrumb-item"><a asp-controller="Map" asp-action="Index">Farms</a></li>
+                <li class="breadcrumb-item active">@farm.Name</li>
+            </ol>
+        </nav>
+        <h1 class="farm-hero__name">@farm.Name</h1>
+        <p class="farm-hero__location">
+            <i class="bi bi-geo-alt-fill me-1"></i>@farm.City, @farm.State
+        </p>
+        <div class="farm-hero__rating">
+            <span class="star-rating-lg">&#9733; @farm.Rating.ToString("F1")</span>
+            <span class="farm-review-count">(@farm.ReviewCount reviews)</span>
+        </div>
+    </div>
+</section>
+
+<!-- FARM BODY -->
+<div class="container py-5">
+    <div class="row g-5">
+        <!-- MAIN CONTENT -->
+        <div class="col-lg-8">
+            <!-- ABOUT -->
+            <div class="farm-about mb-5 fade-in-up">
+                <div class="d-flex align-items-center gap-4 mb-4">
+                    <img src="@farm.OwnerImageUrl" alt="@farm.OwnerName" class="farm-owner-avatar" />
+                    <div>
+                        <h3 class="mb-1">@farm.OwnerName</h3>
+                        <p class="text-muted mb-0">Owner &amp; Operator, @farm.Name</p>
+                    </div>
+                </div>
+                <h2 class="farm-section-title">About the Farm</h2>
+                <p class="farm-bio">@farm.Bio</p>
+                <blockquote class="farm-philosophy-quote">@farm.Philosophy</blockquote>
+            </div>
+
+            <!-- PRACTICES -->
+            <div class="farm-practices mb-5 fade-in-up">
+                <h2 class="farm-section-title">Our Practices</h2>
+                <div class="practices-grid">
+                    @foreach (var practice in farm.Practices)
+                    {
+                        <div class="practice-item">
+                            <i class="bi bi-check-circle-fill practice-check-icon"></i>
+                            <span>@practice</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- PRODUCTS -->
+            <div class="farm-products mb-5 fade-in-up">
+                <h2 class="farm-section-title">Products from @farm.Name</h2>
+                @if (!products.Any())
+                {
+                    <p class="text-muted">No products currently listed. Check back soon.</p>
+                }
+                else
+                {
+                    <div class="row g-3">
+                        @foreach (var product in products)
+                        {
+                            <div class="col-sm-6">
+                                <div class="product-card">
+                                    <div class="product-card__image-wrap position-relative">
+                                        <a href="/Products/@product.Id">
+                                            <img src="@product.ImageUrl" alt="@product.Name" class="product-card__img" loading="lazy" />
+                                        </a>
+                                        <span class="product-card__category-badge">@product.Category</span>
+                                        @if (!product.InStock)
+                                        {
+                                            <span class="product-card__oos-badge">Out of Stock</span>
+                                        }
+                                    </div>
+                                    <div class="product-card__body">
+                                        <h5 class="product-card__name">
+                                            <a href="/Products/@product.Id" class="product-name-link">@product.Name</a>
+                                        </h5>
+                                        <p class="product-card__desc">@(product.Description.Length > 80 ? product.Description[..80] + "…" : product.Description)</p>
+                                        <div class="product-card__footer">
+                                            <span class="product-card__price">$@product.Price.ToString("F2")</span>
+                                            @if (product.InStock)
+                                            {
+                                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                                    <input type="hidden" name="productId" value="@product.Id" />
+                                                    <input type="hidden" name="quantity" value="1" />
+                                                    <button type="submit" class="btn btn-terra btn-sm">
+                                                        <i class="bi bi-basket me-1"></i>Add
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-secondary" disabled>Sold Out</button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- REVIEWS -->
+            <div class="farm-reviews fade-in-up">
+                <h2 class="farm-section-title">Community Reviews</h2>
+                @if (!reviews.Any())
+                {
+                    <p class="text-muted">No reviews yet. Be the first!</p>
+                }
+                else
+                {
+                    @foreach (var review in reviews)
+                    {
+                        <div class="review-card mb-3">
+                            <div class="review-card__header">
+                                <img src="@review.AvatarUrl" alt="@review.ReviewerName" class="review-avatar" />
+                                <div class="review-card__meta">
+                                    <strong>@review.ReviewerName</strong>
+                                    <div class="review-stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <span class="@(i <= review.Rating ? "star-filled" : "star-empty")">&#9733;</span>
+                                        }
+                                    </div>
+                                    <small class="text-muted">@review.Date.ToString("MMMM d, yyyy")</small>
+                                </div>
+                            </div>
+                            <p class="review-card__text">@review.Text</p>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-4">
+            <div class="farm-sidebar sticky-top" style="top: 90px;">
+                <div class="farm-info-card mb-4 fade-in-up">
+                    <h5 class="farm-info-card__title">Farm Details</h5>
+                    <ul class="farm-info-list">
+                        <li>
+                            <i class="bi bi-geo-alt-fill"></i>
+                            <span>@farm.Location</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-star-fill"></i>
+                            <span>@farm.Rating.ToString("F1") / 5.0 &bull; @farm.ReviewCount reviews</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-box-seam"></i>
+                            <span>@products.Count product@(products.Count != 1 ? "s" : "") available</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-truck"></i>
+                            <span>Approx. @farm.DistanceMiles miles from you</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="farm-map-preview mb-4 fade-in-up">
+                    <div id="miniMap" style="height: 180px; border-radius: 12px; overflow: hidden;"></div>
+                </div>
+
+                <a asp-controller="Discover" asp-action="Index" class="btn btn-outline-forest w-100 mb-2">
+                    <i class="bi bi-grid me-1"></i>Browse All Products
+                </a>
+                <a asp-controller="Map" asp-action="Index" class="btn btn-ghost-nav w-100">
+                    <i class="bi bi-map me-1"></i>Back to Farm Map
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var miniMap = L.map('miniMap', { zoomControl: false, dragging: false, scrollWheelZoom: false });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: ''
+        }).addTo(miniMap);
+        var lat = @farm.Latitude;
+        var lng = @farm.Longitude;
+        miniMap.setView([lat, lng], 10);
+        var icon = L.divIcon({
+            className: '',
+            html: '<div class="farm-marker" style="background:#2D5016"></div>',
+            iconSize: [28, 28], iconAnchor: [14, 14]
+        });
+        L.marker([lat, lng], { icon: icon }).addTo(miniMap);
+    </script>
+}

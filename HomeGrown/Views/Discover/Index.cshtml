@@ -1,0 +1,199 @@
+@using HomeGrown.Models
+@model List<Product>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Discover Local Products";
+    var categories = ViewBag.Categories as string[] ?? Array.Empty<string>();
+    string? currentCategory = ViewBag.Category;
+    bool inStockOnly = ViewBag.InStockOnly == true;
+    int resultCount = ViewBag.ResultCount ?? 0;
+    string? currentSort = ViewBag.Sort;
+}
+
+<div class="discover-page py-4">
+    <div class="container-fluid px-4">
+        <div class="discover-header mb-4">
+            <h1 class="discover-title">Discover Local Products</h1>
+            <p class="discover-subtitle">Fresh from farms in your region. Filter by what matters to you.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- SIDEBAR FILTERS -->
+            <div class="col-lg-3">
+                <div class="filter-panel">
+                    <div class="filter-panel__header">
+                        <h5><i class="bi bi-funnel me-2"></i>Filters</h5>
+                        <a asp-controller="Discover" asp-action="Index" class="filter-clear-link">Clear all</a>
+                    </div>
+
+                    <form asp-controller="Discover" asp-action="Index" method="get">
+                        <!-- CATEGORY -->
+                        <div class="filter-group">
+                            <h6 class="filter-group__label">Category</h6>
+                            @foreach (var cat in categories)
+                            {
+                                <div class="form-check filter-check">
+                                    <input class="form-check-input" type="radio" name="category"
+                                           id="cat_@cat.Replace(" ", "_").Replace("&", "and")"
+                                           value="@cat"
+                                           @(currentCategory == cat ? "checked" : "") />
+                                    <label class="form-check-label" for="cat_@cat.Replace(" ", "_").Replace("&", "and")">
+                                        @cat
+                                    </label>
+                                </div>
+                            }
+                            <div class="form-check filter-check">
+                                <input class="form-check-input" type="radio" name="category" id="cat_all"
+                                       value="" @(string.IsNullOrEmpty(currentCategory) ? "checked" : "") />
+                                <label class="form-check-label" for="cat_all">All Categories</label>
+                            </div>
+                        </div>
+
+                        <!-- PRICE RANGE -->
+                        <div class="filter-group">
+                            <h6 class="filter-group__label">Price Range</h6>
+                            <div class="d-flex gap-2 align-items-center">
+                                <div class="flex-grow-1">
+                                    <label class="filter-input-label">Min $</label>
+                                    <input type="number" name="minPrice" class="form-control form-control-sm filter-input"
+                                           placeholder="0" value="@ViewBag.MinPrice" min="0" step="0.50" />
+                                </div>
+                                <span class="filter-price-dash mt-3">—</span>
+                                <div class="flex-grow-1">
+                                    <label class="filter-input-label">Max $</label>
+                                    <input type="number" name="maxPrice" class="form-control form-control-sm filter-input"
+                                           placeholder="100" value="@ViewBag.MaxPrice" min="0" step="0.50" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- IN STOCK -->
+                        <div class="filter-group">
+                            <div class="form-check form-switch filter-check">
+                                <input class="form-check-input" type="checkbox" role="switch" id="inStockToggle"
+                                       name="inStockOnly" value="true" @(inStockOnly ? "checked" : "") />
+                                <label class="form-check-label" for="inStockToggle">In Stock Only</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-forest w-100 mt-2">
+                            <i class="bi bi-funnel me-1"></i>Apply Filters
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- PRODUCT GRID -->
+            <div class="col-lg-9">
+                <!-- SORT BAR -->
+                <div class="sort-bar d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <p class="sort-bar__count mb-0">
+                        Showing <strong>@resultCount</strong> product@(resultCount != 1 ? "s" : "")
+                        @if (!string.IsNullOrEmpty(currentCategory))
+                        {
+                            <span> in <strong>@currentCategory</strong></span>
+                        }
+                    </p>
+                    <form asp-controller="Discover" asp-action="Index" method="get" class="d-flex align-items-center gap-2">
+                        @if (!string.IsNullOrEmpty(currentCategory))
+                        {
+                            <input type="hidden" name="category" value="@currentCategory" />
+                        }
+                        @if (inStockOnly)
+                        {
+                            <input type="hidden" name="inStockOnly" value="true" />
+                        }
+                        <label class="sort-label mb-0">Sort:</label>
+                        <select name="sort" class="form-select form-select-sm sort-select" onchange="this.form.submit()">
+                            @{
+                                var sortOptions = new[] {
+                                    ("", "Default"),
+                                    ("price_asc", "Price: Low to High"),
+                                    ("price_desc", "Price: High to Low"),
+                                    ("name", "Name A–Z")
+                                };
+                                foreach (var opt in sortOptions)
+                                {
+                                    var isSelected = currentSort == opt.Item1 || (opt.Item1 == "" && currentSort == null);
+                                    if (isSelected)
+                                    {
+                                        @Html.Raw($"<option value=\"{opt.Item1}\" selected>{opt.Item2}</option>")
+                                    }
+                                    else
+                                    {
+                                        @Html.Raw($"<option value=\"{opt.Item1}\">{opt.Item2}</option>")
+                                    }
+                                }
+                            }
+                        </select>
+                    </form>
+                </div>
+
+                @if (!Model.Any())
+                {
+                    <div class="empty-state text-center py-5">
+                        <div class="empty-state__icon mb-3">
+                            <i class="bi bi-basket2"></i>
+                        </div>
+                        <h3 class="empty-state__title">Nothing in season here yet.</h3>
+                        <p class="empty-state__text">We couldn't find any products matching your filters. Try adjusting your search or clearing the filters.</p>
+                        <a asp-controller="Discover" asp-action="Index" class="btn btn-forest mt-3">Browse All Products</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-4">
+                        @foreach (var product in Model)
+                        {
+                            <div class="col-sm-6 col-xl-4 fade-in-up">
+                                <div class="product-card h-100">
+                                    <div class="product-card__image-wrap position-relative">
+                                        <a href="/Products/@product.Id">
+                                            <img src="@product.ImageUrl" alt="@product.Name" class="product-card__img" loading="lazy" />
+                                        </a>
+                                        <span class="product-card__category-badge">@product.Category</span>
+                                        <button class="wishlist-btn" title="Save for later">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                        @if (!product.InStock)
+                                        {
+                                            <span class="product-card__oos-badge">Out of Stock</span>
+                                        }
+                                    </div>
+                                    <div class="product-card__body">
+                                        <p class="product-card__farm">
+                                            <a href="/Farms/@product.FarmId" class="farm-link">
+                                                <i class="bi bi-geo-alt me-1"></i>@product.FarmName
+                                            </a>
+                                        </p>
+                                        <h5 class="product-card__name">
+                                            <a href="/Products/@product.Id" class="product-name-link">@product.Name</a>
+                                        </h5>
+                                        <p class="product-card__desc">@(product.Description.Length > 90 ? product.Description[..90] + "…" : product.Description)</p>
+                                        <div class="product-card__footer">
+                                            <span class="product-card__price">$@product.Price.ToString("F2") <small>/ @product.Unit</small></span>
+                                            @if (product.InStock)
+                                            {
+                                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                                    <input type="hidden" name="productId" value="@product.Id" />
+                                                    <input type="hidden" name="quantity" value="1" />
+                                                    <button type="submit" class="btn btn-terra btn-sm">
+                                                        <i class="bi bi-basket me-1"></i>Add
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-sm btn-secondary" disabled>Sold Out</button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
