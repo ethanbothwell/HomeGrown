@@ -101,7 +101,10 @@ app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeGrown A
 // Health check endpoint for Railway
 app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
-app.UseHttpsRedirection();
+// Render and most PaaS providers terminate SSL at the load balancer.
+// Only redirect to HTTPS when running locally.
+if (app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
