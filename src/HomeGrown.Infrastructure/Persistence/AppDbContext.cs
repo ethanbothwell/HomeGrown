@@ -14,6 +14,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<Subscriber> Subscribers => Set<Subscriber>();
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
+    public DbSet<FarmSubscription> FarmSubscriptions => Set<FarmSubscription>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

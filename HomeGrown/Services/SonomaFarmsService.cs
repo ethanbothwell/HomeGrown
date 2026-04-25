@@ -50,20 +50,6 @@ public static class SonomaFarmsService
         },
         new FarmMarker
         {
-            Id = 4,
-            Name = "Healdsburg Bread Collective",
-            Description = "A cooperative of three bakers producing naturally leavened breads, seasonal pastries, and stone-milled crackers using locally grown grains from Mendocino County.",
-            Latitude = 38.6105,
-            Longitude = -122.8694,
-            Category = "Bread & Baked Goods",
-            ImageUrl = "https://images.unsplash.com/photo-1585478259715-4d3a23ea9ee4?w=600",
-            Rating = 5.0,
-            ProductCount = 14,
-            IsOpen = true,
-            DistanceMi = "22.7"
-        },
-        new FarmMarker
-        {
             Id = 5,
             Name = "Glen Ellen Honey Co.",
             Description = "Small-batch wildflower and manzanita honey harvested from 80 hives set among the oaks and madrones of Sonoma Mountain. Raw, unfiltered, and deeply aromatic.",
@@ -103,20 +89,6 @@ public static class SonomaFarmsService
             ProductCount = 18,
             IsOpen = true,
             DistanceMi = "14.6"
-        },
-        new FarmMarker
-        {
-            Id = 8,
-            Name = "Bodega Bay Sea Salt & Kelp",
-            Description = "Hand-harvested Pacific sea salt and dried kelp products sourced directly from Bodega Bay. A uniquely coastal Sonoma County artisan offering minerals and umami from the Pacific.",
-            Latitude = 38.3327,
-            Longitude = -123.0508,
-            Category = "Honey & Preserves",
-            ImageUrl = "https://images.unsplash.com/photo-1584483766114-2cea6facdf57?w=600",
-            Rating = 4.7,
-            ProductCount = 5,
-            IsOpen = true,
-            DistanceMi = "28.3"
         },
         new FarmMarker
         {

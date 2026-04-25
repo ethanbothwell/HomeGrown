@@ -1,3 +1,5 @@
+using HomeGrown.Core.Domain.Entities;
+
 namespace HomeGrown.Core.Domain.Interfaces;
 
 /// <summary>
@@ -13,6 +15,9 @@ public interface IUnitOfWork : IDisposable
     IReviewRepository Reviews { get; }
     IRefreshTokenRepository RefreshTokens { get; }
     ISubscriberRepository Subscribers { get; }
+    ISubscriptionPlanRepository SubscriptionPlans { get; }
+    IFarmSubscriptionRepository FarmSubscriptions { get; }
+    IRepository<FarmPractice> FarmPractices { get; }
 
     Task<int> SaveChangesAsync();
 }

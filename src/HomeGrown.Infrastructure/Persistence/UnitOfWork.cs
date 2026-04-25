@@ -1,3 +1,4 @@
+using HomeGrown.Core.Domain.Entities;
 using HomeGrown.Core.Domain.Interfaces;
 using HomeGrown.Infrastructure.Persistence.Repositories;
 
@@ -12,6 +13,9 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     private IReviewRepository? _reviews;
     private IRefreshTokenRepository? _refreshTokens;
     private ISubscriberRepository? _subscribers;
+    private ISubscriptionPlanRepository? _subscriptionPlans;
+    private IFarmSubscriptionRepository? _farmSubscriptions;
+    private IRepository<FarmPractice>? _farmPractices;
 
     public IUserRepository Users => _users ??= new UserRepository(context);
     public IFarmRepository Farms => _farms ??= new FarmRepository(context);
@@ -20,6 +24,9 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     public IReviewRepository Reviews => _reviews ??= new ReviewRepository(context);
     public IRefreshTokenRepository RefreshTokens => _refreshTokens ??= new RefreshTokenRepository(context);
     public ISubscriberRepository Subscribers => _subscribers ??= new SubscriberRepository(context);
+    public ISubscriptionPlanRepository SubscriptionPlans => _subscriptionPlans ??= new SubscriptionPlanRepository(context);
+    public IFarmSubscriptionRepository FarmSubscriptions => _farmSubscriptions ??= new FarmSubscriptionRepository(context);
+    public IRepository<FarmPractice> FarmPractices => _farmPractices ??= new Repository<FarmPractice>(context);
 
     public async Task<int> SaveChangesAsync() => await context.SaveChangesAsync();
 

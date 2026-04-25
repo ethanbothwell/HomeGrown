@@ -24,4 +24,5 @@ public class Farm
     public ICollection<Product> Products { get; set; } = [];
     public ICollection<Review> Reviews { get; set; } = [];
     public ICollection<FarmPractice> Practices { get; set; } = [];
+    public ICollection<SubscriptionPlan> SubscriptionPlans { get; set; } = [];
 }

@@ -86,6 +86,52 @@ public class FarmsController(IUnitOfWork uow) : ControllerBase
         return Ok(MapToDto(farm));
     }
 
+    /// <summary>GET /api/farms/mine — farmer retrieves their own farm profile</summary>
+    [HttpGet("mine")]
+    [Authorize(Roles = "Farmer")]
+    public async Task<IActionResult> GetMine()
+    {
+        var farm = await uow.Farms.GetByOwnerIdAsync(GetUserId());
+        if (farm is null) return NotFound(new { error = "You do not have a farm yet." });
+
+        var farmWithDetails = await uow.Farms.GetByIdWithDetailsAsync(farm.Id);
+        return Ok(MapToDto(farmWithDetails!));
+    }
+
+    /// <summary>POST /api/farms/{id}/practices — farmer adds a practice tag</summary>
+    [HttpPost("{id:guid}/practices")]
+    [Authorize(Roles = "Farmer")]
+    public async Task<IActionResult> AddPractice(Guid id, [FromBody] AddPracticeRequest request)
+    {
+        var farm = await uow.Farms.GetByIdAsync(id);
+        if (farm is null) return NotFound();
+        if (farm.OwnerId != GetUserId()) return Forbid();
+
+        var practice = new FarmPractice { FarmId = id, Name = request.Name };
+        await uow.FarmPractices.AddAsync(practice);
+        await uow.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetById), new { id }, new FarmPracticeDto(practice.Id, practice.Name));
+    }
+
+    /// <summary>DELETE /api/farms/{id}/practices/{practiceId} — farmer removes a practice tag</summary>
+    [HttpDelete("{id:guid}/practices/{practiceId:guid}")]
+    [Authorize(Roles = "Farmer")]
+    public async Task<IActionResult> RemovePractice(Guid id, Guid practiceId)
+    {
+        var farm = await uow.Farms.GetByIdAsync(id);
+        if (farm is null) return NotFound();
+        if (farm.OwnerId != GetUserId()) return Forbid();
+
+        var practice = await uow.FarmPractices.GetByIdAsync(practiceId);
+        if (practice is null || practice.FarmId != id) return NotFound();
+
+        uow.FarmPractices.Remove(practice);
+        await uow.SaveChangesAsync();
+
+        return NoContent();
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private Guid GetUserId() =>
