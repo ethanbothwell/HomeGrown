@@ -62,6 +62,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "HomeGrown API", Version = "v1" });
     c.UseInlineDefinitionsForEnums();
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
     // Allow sending the JWT token from Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
