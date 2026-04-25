@@ -5,15 +5,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HomeGrown.API.Controllers;
 
+public record NewsletterSubscribeRequest([Required, EmailAddress] string Email);
+
 [ApiController]
 [Route("api/subscribe")]
 public class SubscribersController(IUnitOfWork uow) : ControllerBase
 {
-    public record SubscribeRequest([Required, EmailAddress] string Email);
 
     /// <summary>POST /api/subscribe — public</summary>
     [HttpPost]
-    public async Task<IActionResult> Subscribe([FromBody] SubscribeRequest request)
+    public async Task<IActionResult> Subscribe([FromBody] NewsletterSubscribeRequest request)
     {
         var email = request.Email.ToLower();
 

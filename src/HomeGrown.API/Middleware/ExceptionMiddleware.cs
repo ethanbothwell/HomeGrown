@@ -32,7 +32,7 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
             KeyNotFoundException        => (HttpStatusCode.NotFound, exception.Message),
             ArgumentException          => (HttpStatusCode.BadRequest, exception.Message),
             InvalidOperationException  => (HttpStatusCode.BadRequest, exception.Message),
-            _                          => (HttpStatusCode.InternalServerError, $"DEBUG: {exception.GetType().Name}: {exception.Message} | {exception.InnerException?.Message}")
+            _                          => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
         };
 
         context.Response.StatusCode = (int)statusCode;
