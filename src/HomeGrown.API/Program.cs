@@ -2,7 +2,9 @@ using System.Text;
 using HomeGrown.API.Middleware;
 using HomeGrown.API.Services;
 using HomeGrown.Infrastructure;
+using HomeGrown.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -83,13 +85,21 @@ builder.Services.AddSwaggerGen(c =>
 // ─── Build ─────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
+// Auto-run migrations on startup (safe to call on every deploy)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+}
+
 app.UseMiddleware<ExceptionMiddleware>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeGrown API v1"));
-}
+// Swagger on in all environments — useful for frontend dev and testing
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeGrown API v1"));
+
+// Health check endpoint for Railway
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
 
 app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
