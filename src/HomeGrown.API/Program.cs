@@ -15,7 +15,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // ─── API services ─────────────────────────────────────────────────────────
 builder.Services.AddScoped<TokenService>();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+        o.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
 // ─── JWT Authentication ────────────────────────────────────────────────────
 var jwtSecret = builder.Configuration["Jwt:Secret"]
@@ -59,6 +61,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "HomeGrown API", Version = "v1" });
+    c.UseInlineDefinitionsForEnums();
 
     // Allow sending the JWT token from Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
