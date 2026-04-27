@@ -35,6 +35,12 @@
             <span class="star-rating-lg">&#9733; @farm.Rating.ToString("F1")</span>
             <span class="farm-review-count">(@farm.ReviewCount reviews)</span>
         </div>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <button id="followBtn" class="btn btn-outline-cream btn-sm mt-3" data-farm-id="@farm.Id" onclick="toggleFollow(@farm.Id)">
+                <i class="bi bi-heart me-1"></i> Follow
+            </button>
+        }
     </div>
 </section>
 
@@ -217,5 +223,38 @@
             iconSize: [28, 28], iconAnchor: [14, 14]
         });
         L.marker([lat, lng], { icon: icon }).addTo(miniMap);
+    </script>
+    <script>
+    (function() {
+        var btn = document.getElementById('followBtn');
+        if (!btn) return;
+        var farmId = parseInt(btn.dataset.farmId);
+
+        fetch('/api/farms/' + farmId + '/following')
+            .then(function(r) { return r.json(); })
+            .then(function(data) { updateBtn(data.following); })
+            .catch(function() {});
+
+        window.toggleFollow = function(id) {
+            var isFollowing = btn.dataset.following === 'true';
+            fetch('/api/farms/' + id + '/follow', { method: isFollowing ? 'DELETE' : 'POST' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) { updateBtn(data.following); })
+                .catch(function() {});
+        };
+
+        function updateBtn(following) {
+            btn.dataset.following = following;
+            if (following) {
+                btn.innerHTML = '<i class="bi bi-heart-fill me-1"></i> Following';
+                btn.classList.remove('btn-outline-cream');
+                btn.classList.add('btn-terra');
+            } else {
+                btn.innerHTML = '<i class="bi bi-heart me-1"></i> Follow';
+                btn.classList.remove('btn-terra');
+                btn.classList.add('btn-outline-cream');
+            }
+        }
+    })();
     </script>
 }

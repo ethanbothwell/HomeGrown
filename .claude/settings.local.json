@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dotnet ef:*)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&h=400&fit=crop\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://images.unsplash.com/photo-1472145246862-b24cf25c4a36?w=600&h=400&fit=crop\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://images.unsplash.com/photo-1474440692706-2b98b25e4582?w=600&h=400&fit=crop\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://images.unsplash.com/photo-1530610476181-d83430b64dcd?w=600&h=400&fit=crop\")",
+      "Bash(wait)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet tool:*)",
+      "Bash(export PATH=\"$HOME/.dotnet/tools:$PATH\")",
+      "Bash(dotnet script:*)",
+      "Bash(dotnet run:*)",
+      "Bash(docker exec *)",
+      "Bash(sqlite3 /Users/ethanbothwell/HomeGrown/HomeGrown/HomeGrown/HomeGrown.db \"SELECT Id, Name FROM Farms WHERE Name LIKE '%Bodega%' OR Name LIKE '%Healdsburg%';\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
+    ]
+  }
+}

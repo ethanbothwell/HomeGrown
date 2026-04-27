@@ -3,6 +3,7 @@ using System;
 using HomeGrown.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeGrown.Migrations
 {
     [DbContext(typeof(HomeGrownDbContext))]
-    partial class HomeGrownDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260422164032_AddOrdersAndFollows")]
+    partial class AddOrdersAndFollows
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.5");

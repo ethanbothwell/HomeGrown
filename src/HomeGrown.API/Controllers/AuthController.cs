@@ -9,7 +9,7 @@ namespace HomeGrown.API.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(IUnitOfWork uow, TokenService tokenService) : ControllerBase
+public class AuthController(IUnitOfWork uow, TokenService tokenService, IEmailService email) : ControllerBase
 {
     /// <summary>POST /api/auth/register</summary>
     [HttpPost("register")]
@@ -32,6 +32,8 @@ public class AuthController(IUnitOfWork uow, TokenService tokenService) : Contro
 
         await uow.Users.AddAsync(user);
         await uow.SaveChangesAsync();
+
+        _ = email.SendWelcomeAsync(user.Email, user.Name, user.Role.ToString());
 
         return Ok(await BuildAuthResponse(user));
     }

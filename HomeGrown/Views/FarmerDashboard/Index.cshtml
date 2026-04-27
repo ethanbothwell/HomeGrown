@@ -7,6 +7,11 @@
     var products = ViewBag.Products as List<Product> ?? new List<Product>();
     var chartLabels = ViewBag.ChartLabels as string[] ?? Array.Empty<string>();
     var chartData = ViewBag.ChartData as int[] ?? Array.Empty<int>();
+    decimal revenueThisMonth = ViewBag.RevenueThisMonth ?? 0m;
+    int revenueTrend = ViewBag.RevenueTrend ?? 0;
+    int ordersThisMonth = ViewBag.OrdersThisMonth ?? 0;
+    int ordersTrend = ViewBag.OrdersTrend ?? 0;
+    var recentOrders = ViewBag.RecentOrders as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
 }
 
 @section Scripts {
@@ -67,17 +72,27 @@
             <div class="col-sm-6 col-lg-3">
                 <div class="stat-card stat-card--green">
                     <div class="stat-card__icon"><i class="bi bi-currency-dollar"></i></div>
-                    <div class="stat-card__value">$1,760</div>
+                    <div class="stat-card__value">$@revenueThisMonth.ToString("F0")</div>
                     <div class="stat-card__label">Revenue This Month</div>
-                    <div class="stat-card__trend text-success"><i class="bi bi-arrow-up-short"></i> +31% vs last month</div>
+                    @if (revenueTrend != 0)
+                    {
+                        <div class="stat-card__trend @(revenueTrend > 0 ? "text-success" : "text-danger")">
+                            <i class="bi bi-arrow-@(revenueTrend > 0 ? "up" : "down")-short"></i> @(revenueTrend > 0 ? "+" : "")@revenueTrend% vs last month
+                        </div>
+                    }
                 </div>
             </div>
             <div class="col-sm-6 col-lg-3">
                 <div class="stat-card">
                     <div class="stat-card__icon"><i class="bi bi-bag-check"></i></div>
-                    <div class="stat-card__value">24</div>
+                    <div class="stat-card__value">@ordersThisMonth</div>
                     <div class="stat-card__label">Orders This Month</div>
-                    <div class="stat-card__trend text-success"><i class="bi bi-arrow-up-short"></i> +8 vs last month</div>
+                    @if (ordersTrend != 0)
+                    {
+                        <div class="stat-card__trend @(ordersTrend > 0 ? "text-success" : "text-danger")">
+                            <i class="bi bi-arrow-@(ordersTrend > 0 ? "up" : "down")-short"></i> @(ordersTrend > 0 ? "+" : "")@ordersTrend vs last month
+                        </div>
+                    }
                 </div>
             </div>
             <div class="col-sm-6 col-lg-3">
@@ -171,22 +186,31 @@
                     <div class="dashboard-card__header">
                         <h5>Recent Orders</h5>
                     </div>
-                    @foreach (var order in ViewBag.RecentOrders)
+                    @if (recentOrders.Any())
                     {
-                        <div class="farmer-order-item">
-                            <div class="farmer-order-info">
-                                <strong>#@order.Id</strong>
-                                <p class="mb-0 small text-muted">@order.Customer</p>
-                                <p class="mb-0 small text-muted">@order.Date</p>
+                        @foreach (var order in recentOrders)
+                        {
+                            <div class="farmer-order-item">
+                                <div class="farmer-order-info">
+                                    <strong>#@order.Id</strong>
+                                    <p class="mb-0 small text-muted">@order.Customer</p>
+                                    <p class="mb-0 small text-muted">@order.Date</p>
+                                </div>
+                                <div class="text-end">
+                                    <strong>@order.Total</strong>
+                                    <p class="mb-0">
+                                        <span class="status-badge status-badge--@(order.Status.ToLower() == "delivered" ? "delivered" : order.Status.ToLower() == "shipped" ? "shipped" : "pending")">
+                                            @order.Status
+                                        </span>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <strong>@order.Total</strong>
-                                <p class="mb-0">
-                                    <span class="status-badge status-badge--@(order.Status.ToLower() == "delivered" ? "delivered" : order.Status.ToLower() == "shipped" ? "shipped" : "pending")">
-                                        @order.Status
-                                    </span>
-                                </p>
-                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted">No orders yet. They'll appear here as customers buy your products.</p>
                         </div>
                     }
                 </div>

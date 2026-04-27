@@ -1,6 +1,7 @@
 using System.Text;
 using HomeGrown.API.Middleware;
 using HomeGrown.API.Services;
+using Resend;
 using HomeGrown.Infrastructure;
 using HomeGrown.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,6 +17,16 @@ Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"]
 
 // ─── Infrastructure (database + repositories) ─────────────────────────────
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// ─── Resend email ─────────────────────────────────────────────────────────
+builder.Services.AddOptions();
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.Configure<ResendClientOptions>(o =>
+{
+    o.ApiToken = builder.Configuration["Resend:ApiKey"] ?? "";
+});
+builder.Services.AddTransient<IResend, ResendClient>();
+builder.Services.AddTransient<IEmailService, ResendEmailService>();
 
 // ─── API services ─────────────────────────────────────────────────────────
 builder.Services.AddScoped<TokenService>();
