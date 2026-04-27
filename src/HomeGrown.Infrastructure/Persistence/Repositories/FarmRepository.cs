@@ -12,6 +12,7 @@ public class FarmRepository(AppDbContext context) : Repository<Farm>(context), I
             .Include(f => f.Products)
             .Include(f => f.Reviews).ThenInclude(r => r.User)
             .Include(f => f.Practices)
+            .Include(f => f.SubscriptionPlans.Where(p => p.IsActive))
             .FirstOrDefaultAsync(f => f.Id == id);
 
     public async Task<Farm?> GetByOwnerIdAsync(Guid ownerId) =>

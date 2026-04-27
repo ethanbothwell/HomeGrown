@@ -1,3 +1,5 @@
+using HomeGrown.Core.Application.DTOs.Subscriptions;
+
 namespace HomeGrown.Core.Application.DTOs.Farms;
 
 public record FarmDto(
@@ -13,9 +15,10 @@ public record FarmDto(
     string? ImageUrl,
     double Rating,
     int ReviewCount,
-    List<string> Practices,
+    List<FarmPracticeDto> Practices,
     string OwnerName,
-    string? OwnerImageUrl
+    string? OwnerImageUrl,
+    List<SubscriptionPlanDto> SubscriptionPlans
 );
 
 public record CreateFarmRequest(

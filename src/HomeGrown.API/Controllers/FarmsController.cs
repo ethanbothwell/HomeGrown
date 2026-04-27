@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HomeGrown.Core.Application.DTOs.Farms;
+using HomeGrown.Core.Application.DTOs.Subscriptions;
 using HomeGrown.Core.Domain.Entities;
 using HomeGrown.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -144,8 +145,13 @@ public class FarmsController(IUnitOfWork uow) : ControllerBase
     private static FarmDto MapToDto(Farm f) => new(
         f.Id, f.Name, f.Bio, f.Philosophy, f.Location, f.City, f.State,
         f.Latitude, f.Longitude, f.ImageUrl, f.Rating, f.ReviewCount,
-        f.Practices.Select(p => p.Name).ToList(),
+        f.Practices.Select(p => new FarmPracticeDto(p.Id, p.Name)).ToList(),
         f.Owner?.Name ?? string.Empty,
-        f.Owner?.ProfileImageUrl
+        f.Owner?.ProfileImageUrl,
+        f.SubscriptionPlans.Where(p => p.IsActive).Select(p => new SubscriptionPlanDto(
+            p.Id, p.FarmId, f.Name, p.Name, p.Description,
+            p.Price, p.Frequency, p.MaxSubscribers, p.IsActive,
+            p.CreatedAt, p.UpdatedAt
+        )).ToList()
     );
 }
