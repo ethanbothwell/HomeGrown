@@ -10,6 +10,10 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ─── Stripe ───────────────────────────────────────────────────────────────
+Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"]
+    ?? throw new InvalidOperationException("Stripe:SecretKey is required.");
+
 // ─── Infrastructure (database + repositories) ─────────────────────────────
 builder.Services.AddInfrastructure(builder.Configuration);
 

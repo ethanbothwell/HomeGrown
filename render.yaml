@@ -18,3 +18,7 @@ services:
         value: HomeGrownClients
       - key: AllowedOrigins__0
         sync: false
+      - key: Stripe__SecretKey
+        sync: false
+      - key: Stripe__WebhookSecret
+        sync: false
