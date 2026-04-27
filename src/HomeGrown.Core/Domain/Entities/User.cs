@@ -11,6 +11,7 @@ public class User
     public string? GoogleId { get; set; }
     public string? ProfileImageUrl { get; set; }
     public UserRole Role { get; set; } = UserRole.Buyer;
+    public string? Community { get; set; }   // e.g. "Portland", "Corvallis", "Benton County"
     public bool IsEmailVerified { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

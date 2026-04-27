@@ -4,7 +4,10 @@ public record AuthResponse(
     string AccessToken,
     string RefreshToken,
     DateTime AccessTokenExpiry,
-    UserDto User
+    UserDto User,
+    int? WaitlistPosition = null,
+    int? Remaining = null,
+    string? Community = null
 );
 
 public record UserDto(

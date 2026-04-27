@@ -6,6 +6,7 @@ public interface IEmailService
 {
     Task SendWaitlistConfirmationAsync(string toEmail);
     Task SendWelcomeAsync(string toEmail, string name, string role);
+    Task SendUnlockBroadcastAsync(IEnumerable<string> toEmails, string community);
 }
 
 public class ResendEmailService(IResend resend, IConfiguration config, ILogger<ResendEmailService> logger)
@@ -56,7 +57,53 @@ public class ResendEmailService(IResend resend, IConfiguration config, ILogger<R
         }
     }
 
+    public async Task SendUnlockBroadcastAsync(IEnumerable<string> toEmails, string community)
+    {
+        foreach (var toEmail in toEmails)
+        {
+            var msg = new EmailMessage
+            {
+                From    = From,
+                Subject = $"HomeGrown is now live in {community}!",
+                HtmlBody = UnlockHtml(community),
+            };
+            msg.To.Add(toEmail);
+
+            try
+            {
+                await resend.EmailSendAsync(msg);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Failed to send unlock broadcast to {Email}", toEmail);
+            }
+        }
+    }
+
     // ─── Templates ──────────────────────────────────────────────────────────
+
+    private static string UnlockHtml(string community) => $"""
+        {BaseHead()}
+        <body style="margin:0;padding:0;background:#FAF7F2;font-family:'Helvetica Neue',Arial,sans-serif;">
+          {Header()}
+          <div style="max-width:560px;margin:0 auto;padding:40px 24px;">
+            <h1 style="font-family:Georgia,serif;font-size:28px;font-weight:700;color:#1a1a1a;margin:0 0 12px;">
+              HomeGrown is live in {community}.
+            </h1>
+            <p style="font-size:16px;color:#6b6b6b;line-height:1.65;margin:0 0 24px;">
+              Your community hit the threshold. Local farmers in {community} are
+              now on the platform and ready to deliver fresh, seasonal produce
+              straight to your door.
+            </p>
+            <a href="https://homegrown-web.vercel.app/farms"
+               style="display:inline-block;background:#C4622D;color:#ffffff;text-decoration:none;
+                      border-radius:50px;padding:14px 32px;font-size:15px;font-weight:600;">
+              Browse Farms in {community}
+            </a>
+          </div>
+          {Footer()}
+        </body>
+        """;
 
     private static string WaitlistHtml() => $"""
         {BaseHead()}
