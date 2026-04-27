@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# Claude Code local settings (permissions only, but shouldn't be shared)
+.claude/settings.local.json
+
 # Local secrets overrides (use appsettings.local.json for machine-specific secrets)
 appsettings.local.json
 appsettings.*.local.json
