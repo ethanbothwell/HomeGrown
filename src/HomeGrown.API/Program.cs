@@ -57,15 +57,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // ─── CORS ──────────────────────────────────────────────────────────────────
-// Allow the Next.js frontend and React Native metro bundler in development.
-// In production, replace with your real domain.
+// Explicit allowlist from config + all *.vercel.app preview/production URLs.
 var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
     ?? ["http://localhost:3000"];
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
-        policy.WithOrigins(allowedOrigins)
+        policy.SetIsOriginAllowed(origin =>
+              {
+                  if (allowedOrigins.Contains(origin)) return true;
+                  var host = new Uri(origin).Host;
+                  return host == "localhost" || host.EndsWith(".vercel.app");
+              })
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials());
