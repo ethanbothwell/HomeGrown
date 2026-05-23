@@ -7,6 +7,7 @@ public interface IEmailService
     Task SendWaitlistConfirmationAsync(string toEmail);
     Task SendWelcomeAsync(string toEmail, string name, string role);
     Task SendUnlockBroadcastAsync(IEnumerable<string> toEmails, string community);
+    Task SendAdminNewSignupAsync(string name, string email, string role, string? community);
 }
 
 public class ResendEmailService(IResend resend, IConfiguration config, ILogger<ResendEmailService> logger)
@@ -78,6 +79,33 @@ public class ResendEmailService(IResend resend, IConfiguration config, ILogger<R
                 logger.LogWarning(ex, "Failed to send unlock broadcast to {Email}", toEmail);
             }
         }
+    }
+
+    public async Task SendAdminNewSignupAsync(string name, string email, string role, string? community)
+    {
+        var adminEmail = config["Resend:AdminEmail"] ?? "ebothwell22@mail.wou.edu";
+        var msg = new EmailMessage
+        {
+            From = From,
+            Subject = $"[HomeGrown] New {role} signup — {name}",
+            HtmlBody = $"""
+                {BaseHead()}
+                <body style="margin:0;padding:0;background:#FAF7F2;font-family:'Helvetica Neue',Arial,sans-serif;">
+                  {Header()}
+                  <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
+                    <h2 style="font-family:Georgia,serif;font-size:22px;color:#1a1a1a;margin:0 0 16px;">New signup</h2>
+                    <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 8px;"><strong>Name:</strong> {name}</p>
+                    <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 8px;"><strong>Email:</strong> {email}</p>
+                    <p style="font-size:15px;color:#333;line-height:1.6;margin:0 0 8px;"><strong>Role:</strong> {role}</p>
+                    <p style="font-size:15px;color:#333;line-height:1.6;margin:0;"><strong>Community:</strong> {community ?? "not specified"}</p>
+                  </div>
+                  {Footer()}
+                </body>
+                """
+        };
+        msg.To.Add(adminEmail);
+        try { await resend.EmailSendAsync(msg); }
+        catch (Exception ex) { logger.LogWarning(ex, "Failed to send admin signup notification"); }
     }
 
     // ─── Templates ──────────────────────────────────────────────────────────

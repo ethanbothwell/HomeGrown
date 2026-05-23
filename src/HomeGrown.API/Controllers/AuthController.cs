@@ -37,6 +37,7 @@ public class AuthController(IUnitOfWork uow, TokenService tokenService, IEmailSe
         await uow.SaveChangesAsync();
 
         _ = email.SendWelcomeAsync(user.Email, user.Name, user.Role.ToString());
+        _ = email.SendAdminNewSignupAsync(user.Name, user.Email, user.Role.ToString(), community);
 
         // ── Waitlist metadata ─────────────────────────────────────────────────
         int? waitlistPosition = null;
