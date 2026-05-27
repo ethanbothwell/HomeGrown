@@ -22,7 +22,7 @@ public class AuthController(IUnitOfWork uow, TokenService tokenService, IEmailSe
             role == UserRole.Admin)  // admins cannot self-register
             role = UserRole.Buyer;
 
-        var community = string.IsNullOrWhiteSpace(request.Community) ? null : request.Community.Trim();
+        var community = string.IsNullOrWhiteSpace(request.Community) ? null : OregonZipCodes.Resolve(request.Community);
 
         var user = new User
         {
