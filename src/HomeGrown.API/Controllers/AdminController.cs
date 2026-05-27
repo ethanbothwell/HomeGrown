@@ -38,4 +38,18 @@ public class AdminController(IUnitOfWork uow) : ControllerBase
         var farms = await uow.Farms.GetAllAsync();
         return Ok(farms.Select(f => new { f.Id, f.Name, f.OwnerId, f.IsActive, f.CreatedAt }));
     }
+
+    /// <summary>GET /api/admin/subscribers — list all newsletter subscribers</summary>
+    [HttpGet("subscribers")]
+    public async Task<IActionResult> GetAllSubscribers()
+    {
+        var subscribers = await uow.Subscribers.GetAllAsync();
+        return Ok(new
+        {
+            count = subscribers.Count(),
+            subscribers = subscribers
+                .OrderByDescending(s => s.SubscribedAt)
+                .Select(s => new { s.Id, s.Email, s.SubscribedAt })
+        });
+    }
 }
