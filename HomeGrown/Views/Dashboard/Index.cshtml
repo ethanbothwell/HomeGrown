@@ -1,0 +1,188 @@
+@using HomeGrown.Models
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "My Dashboard";
+    string userName = ViewBag.UserName ?? "there";
+    var recommendedProducts = ViewBag.RecommendedProducts as List<Product> ?? new List<Product>();
+    var followedFarms = ViewBag.FollowedFarms as List<Farm> ?? new List<Farm>();
+    int ordersPlaced = ViewBag.OrdersPlaced ?? 0;
+    decimal spentLocally = ViewBag.SpentLocally ?? 0m;
+    int farmsFollowedCount = ViewBag.FarmsFollowedCount ?? 0;
+    int itemsOrdered = ViewBag.ItemsOrdered ?? 0;
+    var orders = ViewBag.Orders as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+
+<div class="dashboard-page py-5">
+    <div class="container">
+        <!-- GREETING -->
+        <div class="dashboard-greeting mb-5 fade-in-up">
+            <h1 class="dashboard-greeting__title">Hello, @userName!</h1>
+            <p class="dashboard-greeting__sub">Here's a look at your HomeGrown activity.</p>
+        </div>
+
+        <!-- STATS -->
+        <div class="row g-3 mb-5 fade-in-up">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-bag-check"></i></div>
+                    <div class="stat-card__value">@ordersPlaced</div>
+                    <div class="stat-card__label">Orders Placed</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-shop"></i></div>
+                    <div class="stat-card__value">@farmsFollowedCount</div>
+                    <div class="stat-card__label">Farms Followed</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="stat-card__value">$@spentLocally.ToString("F2")</div>
+                    <div class="stat-card__label">Spent Locally</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-card__icon"><i class="bi bi-leaf"></i></div>
+                    <div class="stat-card__value">@itemsOrdered</div>
+                    <div class="stat-card__label">Items Ordered</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-8">
+                <!-- RECENT ORDERS -->
+                <div class="dashboard-card mb-4 fade-in-up">
+                    <div class="dashboard-card__header">
+                        <h5>Recent Orders</h5>
+                    </div>
+                    @if (orders.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Date</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in orders)
+                                    {
+                                        <tr>
+                                            <td><span class="order-id">#@order.Id</span></td>
+                                            <td>@order.Date</td>
+                                            <td>@order.Items item@(order.Items != 1 ? "s" : "")</td>
+                                            <td><strong>@order.Total</strong></td>
+                                            <td>
+                                                <span class="status-badge status-badge--delivered">@order.Status</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-2">No orders yet.</p>
+                            <a asp-controller="Discover" asp-action="Index" class="btn btn-terra btn-sm">Start shopping</a>
+                        </div>
+                    }
+                </div>
+
+                <!-- RECOMMENDED PRODUCTS -->
+                <div class="dashboard-card fade-in-up">
+                    <div class="dashboard-card__header">
+                        <h5>Recommended for You</h5>
+                        <a asp-controller="Discover" asp-action="Index" class="dashboard-card__link">Browse all</a>
+                    </div>
+                    <div class="row g-3">
+                        @foreach (var product in recommendedProducts)
+                        {
+                            <div class="col-sm-6">
+                                <div class="product-card-mini">
+                                    <img src="@product.ImageUrl" alt="@product.Name" class="product-card-mini__img" loading="lazy" />
+                                    <div class="product-card-mini__body">
+                                        <p class="product-card-mini__farm">@product.FarmName</p>
+                                        <h6 class="product-card-mini__name">
+                                            <a href="/Products/@product.Id">@product.Name</a>
+                                        </h6>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="product-card__price">$@product.Price.ToString("F2")</span>
+                                            <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                                <input type="hidden" name="productId" value="@product.Id" />
+                                                <input type="hidden" name="quantity" value="1" />
+                                                <button type="submit" class="btn btn-terra btn-xs">Add</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="col-lg-4">
+                <!-- FOLLOWED FARMS -->
+                <div class="dashboard-card mb-4 fade-in-up">
+                    <div class="dashboard-card__header">
+                        <h5>Farms I Follow</h5>
+                        <a asp-controller="Map" asp-action="Index" class="dashboard-card__link">Find more</a>
+                    </div>
+                    @if (followedFarms.Any())
+                    {
+                        @foreach (var farm in followedFarms)
+                        {
+                            <div class="followed-farm-item">
+                                <img src="@farm.ImageUrl" alt="@farm.Name" class="followed-farm-img" loading="lazy" />
+                                <div class="followed-farm-info">
+                                    <strong>@farm.Name</strong>
+                                    <p class="mb-0 small text-muted">@farm.City, @farm.State</p>
+                                    <p class="mb-0 small">&#9733; @farm.Rating.ToString("F1")</p>
+                                </div>
+                                <a href="/Farms/@farm.Id" class="btn btn-outline-forest btn-xs">Visit</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-2">You haven't followed any farms yet.</p>
+                            <a asp-controller="Map" asp-action="Index" class="btn btn-outline-forest btn-sm">Explore farms</a>
+                        </div>
+                    }
+                </div>
+
+                <!-- QUICK LINKS -->
+                <div class="dashboard-card fade-in-up">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="quick-links">
+                        <a asp-controller="Discover" asp-action="Index" class="quick-link-btn">
+                            <i class="bi bi-bag"></i> Shop Products
+                        </a>
+                        <a asp-controller="Map" asp-action="Index" class="quick-link-btn">
+                            <i class="bi bi-map"></i> Farm Map
+                        </a>
+                        <a asp-controller="Cart" asp-action="Index" class="quick-link-btn">
+                            <i class="bi bi-basket"></i> View Cart
+                        </a>
+                        <a asp-controller="Account" asp-action="Logout" class="quick-link-btn quick-link-btn--danger">
+                            <i class="bi bi-box-arrow-right"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

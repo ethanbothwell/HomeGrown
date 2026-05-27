@@ -1,8 +1,136 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using HomeGrown.Models
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Fresh, Local, Grown with Intention";
+    var featuredProducts = ViewBag.FeaturedProducts as List<Product> ?? new List<Product>();
+    var farms = ViewBag.Farms as List<Farm> ?? new List<Farm>();
+    var spotlight = ViewBag.SpotlightFarm as Farm;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- HERO -->
+<section class="hero-section">
+    <div class="hero-section__overlay"></div>
+    <div class="hero-content text-center">
+        <p class="hero-eyebrow fade-in-up">Local. Seasonal. Real.</p>
+        <h1 class="hero-headline fade-in-up">Know Your Farmer.<br>Love Your Food.</h1>
+        <p class="hero-subheading fade-in-up">Fresh, local, and grown with intention.<br>Direct from small farms to your table.</p>
+        <div class="hero-actions fade-in-up d-flex gap-3 justify-content-center flex-wrap mt-4">
+            <a asp-controller="Discover" asp-action="Index" class="btn btn-terra btn-lg px-4">
+                <i class="bi bi-bag me-2"></i>Shop Now
+            </a>
+            <a asp-controller="Map" asp-action="Index" class="btn btn-outline-white btn-lg px-4">
+                <i class="bi bi-map me-2"></i>Find Local Farms
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURED PRODUCTS -->
+<section class="featured-section section-white py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5 fade-in-up">
+            <span class="section-eyebrow">This Week's Picks</span>
+            <h2 class="section-title">Fresh From the Farm</h2>
+        </div>
+        <div class="row g-4">
+            @foreach (var product in featuredProducts)
+            {
+                <div class="col-sm-6 col-lg-4 fade-in-up">
+                    <div class="product-card h-100">
+                        <div class="product-card__image-wrap position-relative">
+                            <a href="/Products/@product.Id">
+                                <img src="@product.ImageUrl" alt="@product.Name" class="product-card__img" loading="lazy" />
+                            </a>
+                            <span class="product-card__category-badge">@product.Category</span>
+                            @if (!product.InStock)
+                            {
+                                <span class="product-card__oos-badge">Out of Stock</span>
+                            }
+                        </div>
+                        <div class="product-card__body">
+                            <p class="product-card__farm">
+                                <i class="bi bi-geo-alt me-1"></i>@product.FarmName
+                            </p>
+                            <h5 class="product-card__name">
+                                <a href="/Products/@product.Id" class="stretched-link-name">@product.Name</a>
+                            </h5>
+                            <p class="product-card__desc">@(product.Description.Length > 80 ? product.Description[..80] + "…" : product.Description)</p>
+                            <div class="product-card__footer">
+                                <span class="product-card__price">$@product.Price.ToString("F2") <small>/ @product.Unit</small></span>
+                                @if (product.InStock)
+                                {
+                                    <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
+                                        <input type="hidden" name="productId" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-terra btn-sm">
+                                            <i class="bi bi-basket me-1"></i>Add
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-secondary" disabled>Sold Out</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="text-center mt-5 fade-in-up">
+            <a asp-controller="Discover" asp-action="Index" class="btn btn-outline-forest btn-lg">
+                View All Products <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FARMER SPOTLIGHT -->
+@if (spotlight != null)
+{
+    <section class="spotlight-section section-white py-0">
+        <div class="row g-0">
+            <div class="col-lg-6">
+                <div class="spotlight-image" style="background-image: url('@spotlight.ImageUrl')"></div>
+            </div>
+            <div class="col-lg-6 d-flex align-items-center">
+                <div class="spotlight-content fade-in-up p-5">
+                    <span class="section-eyebrow">Farmer Spotlight</span>
+                    <h2 class="spotlight-farm-name">@spotlight.Name</h2>
+                    <p class="spotlight-owner">
+                        <i class="bi bi-person me-1"></i>@spotlight.OwnerName &mdash; @spotlight.Location
+                    </p>
+                    <blockquote class="spotlight-quote">@spotlight.Philosophy</blockquote>
+                    <p class="spotlight-bio">@spotlight.Bio</p>
+                    <div class="spotlight-practices mb-4">
+                        @foreach (var p in spotlight.Practices)
+                        {
+                            <span class="practice-badge">@p</span>
+                        }
+                    </div>
+                    <a href="/Farms/@spotlight.Id" class="btn btn-forest">
+                        Visit @spotlight.Name <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- NEWSLETTER -->
+<section class="newsletter-section section-forest py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 text-center fade-in-up">
+                <span class="section-eyebrow-light">Stay in the loop</span>
+                <h2 class="newsletter-title">From the farm, to your inbox.</h2>
+                <p class="newsletter-subtitle">Seasonal finds, farm stories, and early access to new products.</p>
+                <form class="newsletter-form d-flex gap-2 justify-content-center flex-wrap mt-4">
+                    <input type="email" class="form-control newsletter-input" placeholder="your@email.com" />
+                    <button type="submit" class="btn btn-wheat px-4">Subscribe</button>
+                </form>
+                <p class="newsletter-fine-print mt-3">No spam. Unsubscribe anytime. We only send things worth reading.</p>
+            </div>
+        </div>
+    </div>
+</section>

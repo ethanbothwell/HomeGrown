@@ -1,0 +1,77 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Farm Map";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
+<!-- PAGE HEADER -->
+<div class="map-page-header">
+    <div class="container">
+        <h1 class="map-page-header__title">Explore Local Farms</h1>
+        <p class="map-page-header__sub">Discover farmers and artisans in your area — click any pin to learn more.</p>
+    </div>
+</div>
+
+<!-- CATEGORY FILTER CHIPS -->
+<div class="map-filter-bar">
+    <div class="container-fluid px-4">
+        <div class="map-filter-chips" id="categoryChips">
+            <button class="map-chip active" data-category="All">All</button>
+            <button class="map-chip" data-category="Produce">🥬 Produce</button>
+            <button class="map-chip" data-category="Dairy & Eggs">🥚 Dairy &amp; Eggs</button>
+            <button class="map-chip" data-category="Bread & Baked Goods">🍞 Bread &amp; Baked</button>
+            <button class="map-chip" data-category="Honey & Preserves">🍯 Honey &amp; Preserves</button>
+            <button class="map-chip" data-category="Meat & Poultry">🥩 Meat &amp; Poultry</button>
+            <button class="map-chip" data-category="Wine & Beverages">🍷 Wine &amp; Beverages</button>
+        </div>
+    </div>
+</div>
+
+<!-- MAP + SIDEBAR LAYOUT -->
+<div class="map-main-layout" id="mapMainLayout">
+
+    <!-- MAP -->
+    <div class="map-canvas-wrap" id="mapCanvasWrap">
+        <div id="farmMap"></div>
+        <!-- Recenter button -->
+        <button class="map-recenter-btn" id="recenterBtn" title="Recenter map">
+            <i class="bi bi-crosshair"></i>
+        </button>
+        <!-- Mobile toggle -->
+        <div class="map-view-toggle d-lg-none">
+            <button class="map-toggle-btn active" id="btnMapView" onclick="showMapView()">
+                <i class="bi bi-map me-1"></i>Map
+            </button>
+            <button class="map-toggle-btn" id="btnListView" onclick="showListView()">
+                <i class="bi bi-list-ul me-1"></i>List
+            </button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="map-sidebar-panel" id="mapSidebar">
+        <!-- Search -->
+        <div class="sidebar-search-wrap">
+            <i class="bi bi-search sidebar-search-icon"></i>
+            <input type="text" id="sidebarSearch" class="sidebar-search-input" placeholder="Search farms..." />
+        </div>
+
+        <!-- Count -->
+        <div class="sidebar-count-bar">
+            <span id="sidebarCount">12</span> farms shown
+        </div>
+
+        <!-- Farm cards list -->
+        <div class="sidebar-farm-list" id="sidebarFarmList">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="~/js/map.js" asp-append-version="true"></script>
+}

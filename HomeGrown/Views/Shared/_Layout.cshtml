@@ -1,47 +1,135 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HomeGrown</title>
-    <script type="importmap"></script>
+    <title>@(ViewData["Title"] != null ? ViewData["Title"] + " — HomeGrown" : "HomeGrown — Farm to Table Marketplace")</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HomeGrown.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HomeGrown</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+
+    <nav class="navbar navbar-expand-lg navbar-homegrown sticky-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
+                    <path d="M14 3C14 3 5 9 5 17C5 21.418 9.134 25 14 25C18.866 25 23 21.418 23 17C23 9 14 3 14 3Z" fill="#87A878"/>
+                    <path d="M14 8C14 8 9 12 9 17C9 19.761 11.239 22 14 22C16.761 22 19 19.761 19 17C19 12 14 8 14 8Z" fill="#FAF7F2"/>
+                    <path d="M14 11L14 24" stroke="#2D5016" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="brand-text">HomeGrown</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon-custom">
+                    <span></span><span></span><span></span>
+                </span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Discover" asp-action="Index">Discover</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Map" asp-action="Index">
+                            <i class="bi bi-map me-1"></i>Map
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-2">
+                    <a asp-controller="Cart" asp-action="Index" class="btn btn-cart-icon position-relative">
+                        <i class="bi bi-basket2"></i>
+                        <span class="cart-label">Cart</span>
+                    </a>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        var isFarmer = User.FindFirst("IsFarmer")?.Value == "True";
+                        <a asp-controller="@(isFarmer ? "FarmerDashboard" : "Dashboard")" asp-action="Index" class="btn btn-outline-cream btn-sm">
+                            <i class="bi bi-person-circle me-1"></i>Dashboard
+                        </a>
+                        <a asp-controller="Account" asp-action="Logout" class="btn btn-sm btn-ghost-nav">Sign Out</a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-cream btn-sm">Sign In</a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-terra btn-sm">Join Free</a>
+                    }
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+        </div>
+    </nav>
 
-    <footer class="border-top footer text-muted">
+    <main>
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
         <div class="container">
-            &copy; 2026 - HomeGrown - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row footer-top">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <div class="footer-brand mb-3">
+                        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" class="me-2">
+                            <path d="M14 3C14 3 5 9 5 17C5 21.418 9.134 25 14 25C18.866 25 23 21.418 23 17C23 9 14 3 14 3Z" fill="#87A878"/>
+                            <path d="M14 8C14 8 9 12 9 17C9 19.761 11.239 22 14 22C16.761 22 19 19.761 19 17C19 12 14 8 14 8Z" fill="#FAF7F2" opacity="0.5"/>
+                        </svg>
+                        <span class="footer-brand-name">HomeGrown</span>
+                    </div>
+                    <p class="footer-tagline">From the soil to your table.</p>
+                    <p class="footer-desc">Connecting local farmers and artisans with communities who care about where their food comes from.</p>
+                    <div class="social-links mt-3">
+                        <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#" class="social-link"><i class="bi bi-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2 mb-4 mb-lg-0">
+                    <h6 class="footer-heading">Shop</h6>
+                    <ul class="footer-links">
+                        <li><a asp-controller="Discover" asp-action="Index">All Products</a></li>
+                        <li><a asp-controller="Discover" asp-action="Index" asp-route-category="Produce">Produce</a></li>
+                        <li><a asp-controller="Discover" asp-action="Index" asp-route-category="Dairy">Dairy</a></li>
+                        <li><a asp-controller="Discover" asp-action="Index" asp-route-category="Meat">Meat</a></li>
+                        <li><a asp-controller="Discover" asp-action="Index" asp-route-category="Bread & Baked">Bread & Baked</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2 mb-4 mb-lg-0">
+                    <h6 class="footer-heading">Explore</h6>
+                    <ul class="footer-links">
+                        <li><a asp-controller="Map" asp-action="Index">Farm Map</a></li>
+                        <li><a asp-controller="Account" asp-action="Register">Sell on HomeGrown</a></li>
+                        <li><a asp-controller="Account" asp-action="Login">Sign In</a></li>
+                        <li><a asp-controller="Dashboard" asp-action="Index">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h6 class="footer-heading">Stay in the Loop</h6>
+                    <p class="footer-newsletter-text">Seasonal picks, farm stories, and recipes — delivered weekly.</p>
+                    <form class="newsletter-form footer-newsletter">
+                        <input type="email" name="email" class="form-control footer-email-input" placeholder="your@email.com" />
+                        <button type="submit" class="btn btn-wheat">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 HomeGrown. All rights reserved. Made with care for local food systems.</p>
+                <div class="footer-bottom-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Accessibility</a>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

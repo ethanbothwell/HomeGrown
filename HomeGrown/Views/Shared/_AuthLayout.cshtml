@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@(ViewData["Title"] != null ? ViewData["Title"] + " — HomeGrown" : "HomeGrown")</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="auth-body">
+    <div class="auth-split">
+        <div class="auth-image-panel d-none d-md-block">
+            <div class="auth-image-overlay"></div>
+            <div class="auth-image-content">
+                <div class="auth-logo-white">
+                    <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+                        <path d="M14 3C14 3 5 9 5 17C5 21.418 9.134 25 14 25C18.866 25 23 21.418 23 17C23 9 14 3 14 3Z" fill="#87A878"/>
+                        <path d="M14 8C14 8 9 12 9 17C9 19.761 11.239 22 14 22C16.761 22 19 19.761 19 17C19 12 14 8 14 8Z" fill="white" opacity="0.6"/>
+                    </svg>
+                    <span>HomeGrown</span>
+                </div>
+                <div class="auth-image-quote">
+                    <blockquote>"Eat food. Not too much. Mostly plants."</blockquote>
+                    <cite>— Michael Pollan</cite>
+                </div>
+            </div>
+        </div>
+        <div class="auth-form-panel">
+            <div class="auth-form-inner">
+                <a asp-controller="Home" asp-action="Index" class="auth-back-link d-md-none mb-4 d-block">
+                    <i class="bi bi-arrow-left me-1"></i>Back to HomeGrown
+                </a>
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

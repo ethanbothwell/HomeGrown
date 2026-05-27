@@ -1,0 +1,6 @@
+@HomeGrown.API_HostAddress = http://localhost:5298
+
+GET {{HomeGrown.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

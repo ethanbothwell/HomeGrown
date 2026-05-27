@@ -1,0 +1,126 @@
+@using HomeGrown.Models
+@model List<CartItem>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Your Cart";
+    decimal total = ViewBag.Total ?? 0m;
+    decimal shipping = total > 0 ? 5.99m : 0m;
+    decimal orderTotal = total + shipping;
+}
+
+<div class="cart-page py-5">
+    <div class="container">
+        <h1 class="cart-title mb-4">Your Cart</h1>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-cart text-center py-5">
+                <div class="empty-cart__icon mb-4">
+                    <i class="bi bi-basket2"></i>
+                </div>
+                <h3>Your cart is empty.</h3>
+                <p class="text-muted">Looks like you haven't added anything yet. Head to the market and find something fresh!</p>
+                <div class="d-flex gap-3 justify-content-center mt-4">
+                    <a asp-controller="Discover" asp-action="Index" class="btn btn-forest btn-lg">
+                        <i class="bi bi-bag me-2"></i>Browse Products
+                    </a>
+                    <a asp-controller="Map" asp-action="Index" class="btn btn-outline-forest btn-lg">
+                        Find Farms
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <!-- CART ITEMS -->
+                <div class="col-lg-8">
+                    <div class="cart-items-card">
+                        @foreach (var item in Model)
+                        {
+                            <div class="cart-item">
+                                <img src="@item.ImageUrl" alt="@item.ProductName" class="cart-item__img" />
+                                <div class="cart-item__details">
+                                    <h6 class="cart-item__name">@item.ProductName</h6>
+                                    <p class="cart-item__farm">
+                                        <i class="bi bi-geo-alt me-1"></i>@item.FarmName
+                                    </p>
+                                    <p class="cart-item__unit-price">$@item.Price.ToString("F2") each</p>
+                                </div>
+                                <div class="cart-item__qty">
+                                    <form asp-controller="Cart" asp-action="UpdateQuantity" method="post" class="qty-form">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <div class="qty-stepper qty-stepper--sm">
+                                            <button type="submit" name="quantity" value="@(item.Quantity - 1)" class="qty-btn qty-minus">−</button>
+                                            <span class="qty-display">@item.Quantity</span>
+                                            <button type="submit" name="quantity" value="@(item.Quantity + 1)" class="qty-btn qty-plus">+</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="cart-item__subtotal">
+                                    <span>$@((item.Price * item.Quantity).ToString("F2"))</span>
+                                </div>
+                                <div class="cart-item__remove">
+                                    <form asp-controller="Cart" asp-action="Remove" method="post">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-remove" title="Remove">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="cart-actions mt-3 d-flex gap-2">
+                        <a asp-controller="Discover" asp-action="Index" class="btn btn-outline-forest">
+                            <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ORDER SUMMARY -->
+                <div class="col-lg-4">
+                    <div class="order-summary-card">
+                        <h5 class="order-summary-card__title">Order Summary</h5>
+                        <ul class="order-summary-list">
+                            <li>
+                                <span>Subtotal (@Model.Sum(i => i.Quantity) item@(Model.Sum(i => i.Quantity) != 1 ? "s" : ""))</span>
+                                <span>$@total.ToString("F2")</span>
+                            </li>
+                            <li>
+                                <span>Delivery</span>
+                                <span>$@shipping.ToString("F2")</span>
+                            </li>
+                            <li class="order-summary-list__divider"></li>
+                            <li class="order-summary-list__total">
+                                <span>Total</span>
+                                <span>$@orderTotal.ToString("F2")</span>
+                            </li>
+                        </ul>
+
+                        <a asp-controller="Checkout" asp-action="Index" class="btn btn-forest btn-lg w-100 mt-3">
+                            Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+
+                        <div class="order-summary-trust mt-3 text-center">
+                            <small><i class="bi bi-shield-check me-1 text-success"></i>Secure checkout</small>
+                            <small class="ms-3"><i class="bi bi-arrow-counterclockwise me-1 text-success"></i>Easy returns</small>
+                        </div>
+                    </div>
+
+                    <div class="order-summary-farms mt-3">
+                        <h6 class="mb-2">Ships from</h6>
+                        @foreach (var farmName in Model.Select(i => i.FarmName).Distinct())
+                        {
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-shop text-forest"></i>
+                                <small>@farmName</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

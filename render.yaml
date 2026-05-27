@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: homegrown-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Secret
+        sync: false
+      - key: Jwt__Issuer
+        value: HomeGrown
+      - key: Jwt__Audience
+        value: HomeGrownClients
+      - key: AllowedOrigins__0
+        sync: false
+      - key: Stripe__SecretKey
+        sync: false
+      - key: Stripe__WebhookSecret
+        sync: false

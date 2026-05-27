@@ -1,0 +1,104 @@
+@using HomeGrown.Models
+@model CheckoutViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Order Confirmed!";
+    var orderNum = new Random().Next(10000, 99999);
+}
+
+<div class="confirm-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <!-- SUCCESS ANIMATION -->
+                <div class="confirm-success-icon mb-4">
+                    <div class="confirm-check-circle">
+                        <i class="bi bi-check-lg"></i>
+                    </div>
+                </div>
+
+                <h1 class="confirm-title">Your order is on its way from the farm!</h1>
+                <p class="confirm-subtitle">Thank you, <strong>@Model.FullName</strong>. Your order #<strong>HG-@orderNum</strong> has been received. You'll get a confirmation at <strong>@Model.Email</strong>.</p>
+
+                <!-- CONFIRMATION CARD -->
+                <div class="confirm-card mt-5 text-start">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="confirm-card__section-title">Delivering to</h6>
+                            <p class="mb-0">@Model.FullName</p>
+                            <p class="mb-0 text-muted">@Model.Address</p>
+                            <p class="mb-0 text-muted">@Model.City, @Model.State @Model.Zip</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="confirm-card__section-title">Estimated Delivery</h6>
+                            <p class="mb-0">
+                                <strong>@DateTime.Now.AddDays(3).ToString("dddd, MMMM d")</strong> —
+                                @DateTime.Now.AddDays(5).ToString("MMMM d, yyyy")
+                            </p>
+                            <p class="text-muted mb-0 small">Delivered fresh from each farm</p>
+                        </div>
+                    </div>
+
+                    <div class="order-summary-divider my-4"></div>
+
+                    <h6 class="confirm-card__section-title mb-3">Items Ordered</h6>
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="confirm-item mb-3">
+                            <img src="@item.ImageUrl" alt="@item.ProductName" class="confirm-item__img" />
+                            <div class="confirm-item__info">
+                                <p class="confirm-item__name">@item.ProductName</p>
+                                <p class="confirm-item__farm text-muted">@item.FarmName &bull; Qty: @item.Quantity</p>
+                            </div>
+                            <span class="confirm-item__price">$@((item.Price * item.Quantity).ToString("F2"))</span>
+                        </div>
+                    }
+
+                    <div class="order-summary-divider my-3"></div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>Order Total</strong>
+                        <strong class="confirm-total">$@((Model.Total + 5.99m).ToString("F2"))</strong>
+                    </div>
+                </div>
+
+                <!-- WHAT'S NEXT -->
+                <div class="confirm-next-steps mt-5">
+                    <h5 class="mb-4">What happens next?</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="confirm-next-card">
+                                <i class="bi bi-envelope-check mb-2"></i>
+                                <h6>Confirmation Email</h6>
+                                <p class="small text-muted">You'll receive an email shortly with your order details.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="confirm-next-card">
+                                <i class="bi bi-basket mb-2"></i>
+                                <h6>Farmers Pack</h6>
+                                <p class="small text-muted">Your farmers carefully pack your items fresh from harvest.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="confirm-next-card">
+                                <i class="bi bi-truck mb-2"></i>
+                                <h6>Delivered Fresh</h6>
+                                <p class="small text-muted">Your order arrives in eco-friendly packaging, fresh as can be.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center mt-5 flex-wrap">
+                    <a asp-controller="Discover" asp-action="Index" class="btn btn-forest btn-lg">
+                        <i class="bi bi-bag me-2"></i>Continue Shopping
+                    </a>
+                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-forest btn-lg">
+                        View My Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
